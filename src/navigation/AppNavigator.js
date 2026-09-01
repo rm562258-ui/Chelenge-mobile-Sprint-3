@@ -1,14 +1,36 @@
-import { CardStyleInterpolators, createStackNavigator } from "@react-navigation/stack";
-import AgendaCuidadosScreen from "../screens/AgendaCuidadosScreen";
-import AlertasScreen from "../screens/AlertasScreen";
-import HomeScreen from "../screens/HomeScreen";
-import pagCadastro from "../screens/pagCadastro";
-import PagDev from "../screens/PagDev";
-import pagPerfil from "../screens/pagPerfil";
+import { CardStyleInterpolators, createStackNavigator } from '@react-navigation/stack';
+import { ActivityIndicator, View } from 'react-native';
+
+import { useAuth } from '../hooks/useAuth';
+import AgendaCuidadosScreen from '../screens/AgendaCuidadosScreen';
+import AlertasScreen from '../screens/AlertasScreen';
+import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
+import HomeScreen from '../screens/HomeScreen';
+import LoginScreen from '../screens/LoginScreen';
+import pagCadastro from '../screens/pagCadastro';
+import PagDev from '../screens/PagDev';
+import pagPerfil from '../screens/pagPerfil';
+import RegisterScreen from '../screens/RegisterScreen';
 
 const Stack = createStackNavigator();
 
-export default function AppNavigator() {
+function AuthStack() {
+  return (
+    <Stack.Navigator
+      initialRouteName="Login"
+      screenOptions={{
+        headerShown: false,
+        cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+      }}
+    >
+      <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="Register" component={RegisterScreen} />
+      <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+    </Stack.Navigator>
+  );
+}
+
+function AppStack() {
   return (
     <Stack.Navigator
       initialRouteName="Home"
@@ -28,4 +50,18 @@ export default function AppNavigator() {
       <Stack.Screen name="Equipe" component={PagDev} options={{ title: 'Equipe' }} />
     </Stack.Navigator>
   );
+}
+
+export default function AppNavigator() {
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F6FEFA' }}>
+        <ActivityIndicator size="large" color="#2563EB" />
+      </View>
+    );
+  }
+
+  return isAuthenticated ? <AppStack /> : <AuthStack />;
 }

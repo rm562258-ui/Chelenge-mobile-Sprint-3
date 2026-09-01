@@ -1,9 +1,13 @@
 import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
+
 import AppButton from '../../components/AppButton';
 import HeaderSection from '../../components/HeaderSection';
 import ProfileCard from '../../components/ProfileCard';
+import { useAuth } from '../hooks/useAuth';
 
 export default function HomeScreen({ navigation }) {
+  const { logout, loading } = useAuth();
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#F6FEFA' }}>
       <ScrollView contentContainerStyle={styles.container}>
@@ -28,7 +32,8 @@ export default function HomeScreen({ navigation }) {
         <AppButton title="Cadastrar Pet" onPress={() => navigation.navigate('CadastroPet')} style={{ marginBottom: 8 }} />
         <AppButton title="Ver Perfil do Pet" onPress={() => navigation.navigate('PerfilPet')} variant="outline" style={{ marginBottom: 8 }} />
         <AppButton title="Agenda de Cuidados" onPress={() => navigation.navigate('AgendaCuidados')} variant="outline" style={{ marginBottom: 8 }} />
-        <AppButton title="Alertas e Recomendações" onPress={() => navigation.navigate('Alertas')} variant="outline" />
+        <AppButton title="Alertas e Recomendações" onPress={() => navigation.navigate('Alertas')} variant="outline" style={{ marginBottom: 8 }} />
+        <AppButton title="Sair" onPress={logout} variant="outline" loading={loading} disabled={loading} />
       </ScrollView>
     </SafeAreaView>
   );
