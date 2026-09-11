@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, useEffect, useState } from "react";
+import { showToast } from '../utils/toast';
 
 export const UserContext = createContext(null);
 
@@ -30,8 +31,8 @@ export const UserProvider = ({ children }) => {
         if (raw) {
           setProfileState(JSON.parse(raw));
         }
-      } catch (err) {
-        console.warn("Falha ao carregar perfil persistido", err);
+      } catch {
+        showToast("Não foi possível carregar o perfil salvo.", 'error');
       }
     })();
   }, []);
@@ -41,8 +42,8 @@ export const UserProvider = ({ children }) => {
     setProfileState(merged);
     try {
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
-    } catch (err) {
-      console.warn("Falha ao salvar perfil", err);
+    } catch {
+      showToast("Não foi possível salvar o perfil.", 'error');
     }
   };
 
@@ -50,8 +51,8 @@ export const UserProvider = ({ children }) => {
     setProfileState(initial);
     try {
       await AsyncStorage.removeItem(STORAGE_KEY);
-    } catch (err) {
-      console.warn("Falha ao limpar perfil", err);
+    } catch {
+      showToast("Não foi possível limpar o perfil.", 'error');
     }
   };
 

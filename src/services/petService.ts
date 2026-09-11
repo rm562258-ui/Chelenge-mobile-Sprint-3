@@ -1,4 +1,4 @@
-import api from '../api/client';
+import { createCrudService } from '../api/crudService';
 import { API_ENDPOINTS } from '../api/endpoints';
 
 export type PetPayload = {
@@ -11,12 +11,7 @@ export type PetPayload = {
     contact?: string;
 };
 
-export const petService = {
-    list: () => api.get(API_ENDPOINTS.pets.list),
-    create: (payload: PetPayload) => api.post(API_ENDPOINTS.pets.create, payload),
-    detail: (id: string) => api.get(API_ENDPOINTS.pets.detail(id)),
-    update: (id: string, payload: Partial<PetPayload>) => api.put(API_ENDPOINTS.pets.update(id), payload),
-    delete: (id: string) => api.delete(API_ENDPOINTS.pets.delete(id)),
-};
+const crud = createCrudService<PetPayload>(API_ENDPOINTS.pets);
+export const petService = { ...crud, list: crud.getAll, detail: crud.getById };
 
 export default petService;

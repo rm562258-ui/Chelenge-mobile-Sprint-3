@@ -9,6 +9,7 @@ import AppInput from '../../components/AppInput';
 import { useAuth } from '../hooks/useAuth';
 
 const registerSchema = z.object({
+    name: z.string().trim().min(2, 'Informe seu nome completo.'),
     email: z.string().trim().email('Informe um e-mail válido.'),
     password: z.string().min(6, 'A senha deve ter pelo menos 6 caracteres.'),
     confirmPassword: z.string().min(6, 'Confirme sua senha.'),
@@ -28,6 +29,7 @@ export default function RegisterScreen() {
     } = useForm({
         resolver: zodResolver(registerSchema),
         defaultValues: {
+            name: '',
             email: '',
             password: '',
             confirmPassword: '',
@@ -35,7 +37,7 @@ export default function RegisterScreen() {
     });
 
     const onSubmit = async (data) => {
-        await signUp(data.email, data.password);
+        await signUp(data.name, data.email, data.password);
     };
 
     return (
@@ -43,6 +45,21 @@ export default function RegisterScreen() {
             <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
                 <Text style={styles.title}>Criar conta</Text>
                 <Text style={styles.subtitle}>Cadastre-se para começar a acompanhar seu pet</Text>
+
+                <Controller
+                    control={control}
+                    name="name"
+                    render={({ field: { onChange, value } }) => (
+                        <AppInput
+                            label="Nome"
+                            placeholder="Seu nome completo"
+                            value={value}
+                            onChangeText={onChange}
+                            error={errors.name?.message}
+                            leftIcon="👤"
+                        />
+                    )}
+                />
 
                 <Controller
                     control={control}

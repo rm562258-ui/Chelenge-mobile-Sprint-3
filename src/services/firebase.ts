@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
 import { getApp, getApps, initializeApp } from 'firebase/app';
-import { initializeAuth, type Auth } from 'firebase/auth';
+import { getAuth, getReactNativePersistence, initializeAuth, type Auth } from 'firebase/auth';
 
 type ExtraConfig = Record<string, string | undefined>;
 
@@ -18,39 +18,30 @@ const firebaseConfig = {
 
 const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 
-const reactNativePersistence = {
-    type: 'LOCAL' as const,
-    _isAvailable: async () => {
-        try {
-            await AsyncStorage.setItem('@firebase/auth/available', '1');
-            await AsyncStorage.removeItem('@firebase/auth/available');
-            return true;
-        } catch {
-            return false;
+const initializeFirebaseAuth = (): Auth => {
+    try {
+        return initializeAuth(app, {
+            persistence: getReactNativePersistence(AsyncStorage),
+        });
+    } catch (error) {
+        if ((error as { code?: string })?.code === 'auth/already-initialized') {
+            return getAuth(app);
         }
-    },
-    _set: async (key: string, value: unknown) => {
-        await AsyncStorage.setItem(key, JSON.stringify(value));
-    },
-    _get: async <T>(key: string): Promise<T | null> => {
-        const value = await AsyncStorage.getItem(key);
-        return value ? (JSON.parse(value) as T) : null;
-    },
-    _remove: async (key: string) => {
-        await AsyncStorage.removeItem(key);
-    },
-    _addListener: () => undefined,
-    _removeListener: () => undefined,
-} as any;
 
-export const auth: Auth = initializeAuth(app, {
-    persistence: reactNativePersistence,
-});
+        throw error;
+    }
+};
+
+export const auth: Auth = initializeFirebaseAuth();
 
 export const firebaseErrorMessage = (error: unknown) => {
     const code = (error as { code?: string })?.code ?? '';
 
     switch (code) {
+        case 'auth/invalid-api-key':
+            return 'A configuração do Firebase está incompleta. Informe as credenciais do projeto.';
+        case 'auth/operation-not-allowed':
+            return 'O cadastro por e-mail não está habilitado no Firebase.';
         case 'auth/invalid-email':
             return 'Informe um e-mail válido.';
         case 'auth/user-disabled':

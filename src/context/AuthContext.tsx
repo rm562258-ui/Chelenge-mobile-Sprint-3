@@ -1,15 +1,17 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
     createUserWithEmailAndPassword,
-    onAuthStateChanged,
+    onIdTokenChanged,
     sendPasswordResetEmail,
     signInWithEmailAndPassword,
     signOut,
+    updateProfile,
     type User,
 } from 'firebase/auth';
 import { createContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 
 import { auth, AUTH_SESSION_KEY, firebaseErrorMessage } from '../services/firebase';
+import { setAuthToken } from '../api/client';
 import { showToast } from '../utils/toast';
 
 type AuthContextValue = {
@@ -17,7 +19,7 @@ type AuthContextValue = {
     loading: boolean;
     isAuthenticated: boolean;
     signIn: (email: string, password: string) => Promise<void>;
-    signUp: (email: string, password: string) => Promise<void>;
+    signUp: (name: string, email: string, password: string) => Promise<void>;
     resetPassword: (email: string) => Promise<void>;
     logout: () => Promise<void>;
 };
@@ -29,11 +31,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+        const unsubscribe = onIdTokenChanged(auth, async (firebaseUser) => {
             setUser(firebaseUser);
 
             try {
                 if (firebaseUser) {
+                    await setAuthToken(await firebaseUser.getIdToken());
                     await AsyncStorage.setItem(
                         AUTH_SESSION_KEY,
                         JSON.stringify({
@@ -42,10 +45,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                         })
                     );
                 } else {
+                    await setAuthToken(null);
                     await AsyncStorage.removeItem(AUTH_SESSION_KEY);
                 }
-            } catch (error) {
-                console.warn('Erro ao persistir sessão do usuário', error);
+            } catch {
+                showToast('Não foi possível sincronizar a sessão.', 'error');
             }
 
             setLoading(false);
@@ -70,11 +74,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
-    const signUp = async (email: string, password: string) => {
+    const signUp = async (name: string, email: string, password: string) => {
         setLoading(true);
 
         try {
             const result = await createUserWithEmailAndPassword(auth, email.trim(), password);
+            await updateProfile(result.user, { displayName: name.trim() });
             setUser(result.user);
             showToast('Cadastro realizado com sucesso.', 'success');
         } catch (error) {

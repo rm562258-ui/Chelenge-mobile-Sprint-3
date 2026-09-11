@@ -1,0 +1,58 @@
+import { useMemo, useState } from 'react';
+import { FlatList, RefreshControl, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import AppButton from '../../components/AppButton';
+import HeaderSection from '../../components/HeaderSection';
+import ProfileCard from '../../components/ProfileCard';
+import { usePets } from '../hooks/usePets';
+import SearchBar from '../components/ui/SearchBar';
+import LoadingSkeleton from '../components/ui/LoadingSkeleton';
+import { EmptyState, ErrorState } from '../components/ui/ListState';
+import { useDebouncedValue } from '../hooks/useDebouncedValue';
+
+export default function PetsListScreen({ navigation }) {
+    const { data, isLoading, isError, refetch } = usePets();
+    const [query, setQuery] = useState('');
+    const [sort] = useState('name');
+    const debouncedQuery = useDebouncedValue(query);
+
+    const items = useMemo(() => {
+        const list = Array.isArray(data) ? data : [];
+        const filtered = list.filter((p) => p.petNome?.toLowerCase().includes(debouncedQuery.toLowerCase()));
+        if (sort === 'name') return filtered.sort((a, b) => (a.petNome || '').localeCompare(b.petNome || ''));
+        return filtered;
+    }, [data, debouncedQuery, sort]);
+
+    return (
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#F6FEFA' }}>
+            <FlatList
+                ListHeaderComponent={() => (
+                    <View style={styles.header}>
+                        <HeaderSection title="Meus Pets" subtitle="Gerencie seus pets" />
+                        <View style={styles.controls}>
+                            <SearchBar placeholder="Buscar por nome" value={query} onChangeText={setQuery} />
+                            <AppButton title="Novo" onPress={() => navigation.navigate('CadastroPet')} style={styles.newButton} />
+                        </View>
+                    </View>
+                )}
+                data={items}
+                refreshControl={<RefreshControl refreshing={isLoading && !!data} onRefresh={refetch} />}
+                ListEmptyComponent={isError ? <ErrorState title="Erro ao carregar pets." onRetry={refetch} /> : !isLoading ? <EmptyState title="Nenhum pet encontrado." description="Cadastre um pet ou ajuste sua busca." /> : null}
+                ListFooterComponent={isLoading && !data ? <LoadingSkeleton rows={3} /> : null}
+                keyExtractor={(item) => item.id?.toString() || Math.random().toString()}
+                renderItem={({ item }) => (
+                    <TouchableOpacity onPress={() => navigation.navigate('PetDetails', { id: item.id })}>
+                        <ProfileCard title={item.petNome || '—'} icon="🐾">
+                            <Text style={{ color: '#475569' }}>{item.especie || '-'} • {item.raca || '-'}</Text>
+                        </ProfileCard>
+                    </TouchableOpacity>
+                )}
+            />
+        </SafeAreaView>
+    );
+}
+
+const styles = StyleSheet.create({
+    header: { padding: 16 },
+    controls: { gap: 8 },
+    newButton: { alignSelf: 'flex-start' },
+});

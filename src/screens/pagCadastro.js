@@ -1,7 +1,6 @@
 import * as ImagePicker from "expo-image-picker";
 import { useContext, useEffect, useState } from "react";
 import {
-  ActivityIndicator,
   Alert,
   Image,
   SafeAreaView,
@@ -17,7 +16,7 @@ import HeaderSection from '../../components/HeaderSection';
 import ProfileCard from '../../components/ProfileCard';
 import { UserContext } from "../context/UserContext";
 
-export default function pagCadastro({ navigation }) {
+export default function PagCadastro({ navigation }) {
   const { user, setUser, clearUser } = useContext(UserContext);
 
   const [petNome, setPetNome] = useState(user?.petNome || '');
@@ -57,8 +56,7 @@ export default function pagCadastro({ navigation }) {
       if (result.cancelled || result.canceled) return;
       const uri = result.uri || (result.assets && result.assets[0] && result.assets[0].uri);
       if (uri) setPhotoUri(uri);
-    } catch (err) {
-      console.warn('Erro ao abrir câmera', err);
+    } catch {
       Alert.alert('Erro', 'Não foi possível abrir a câmera.');
     }
   };
@@ -84,7 +82,7 @@ export default function pagCadastro({ navigation }) {
     try {
       await setUser(payload);
       navigation.navigate('PerfilPet');
-    } catch (err) {
+    } catch (_err) {
       Alert.alert('Erro', 'Não foi possível salvar. Tente novamente.');
     } finally {
       setSaving(false);
@@ -151,6 +149,8 @@ export default function pagCadastro({ navigation }) {
           <AppButton title={saving ? 'Salvando...' : 'Salvar'} onPress={handleSave} loading={saving} style={{ width: '100%' }} />
           <View style={{ height: 8 }} />
           <AppButton title="Limpar" onPress={handleClearLocal} variant="outline" style={{ width: '100%' }} />
+          <View style={{ height: 8 }} />
+          <AppButton title="Limpar persistido" onPress={handleClearPersisted} variant="outline" style={{ width: '100%' }} />
         </ProfileCard>
       </ScrollView>
     </SafeAreaView>

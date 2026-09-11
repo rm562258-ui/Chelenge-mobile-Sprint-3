@@ -1,33 +1,56 @@
-import { FlatList, SafeAreaView, StyleSheet, Text } from 'react-native';
+import { FlatList, RefreshControl, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import AppButton from '../../components/AppButton';
 import HeaderSection from '../../components/HeaderSection';
 import ProfileCard from '../../components/ProfileCard';
+import { useAppointments } from '../hooks/useAppointments';
+import { useState } from 'react';
+import SearchBar from '../components/ui/SearchBar';
+import LoadingSkeleton from '../components/ui/LoadingSkeleton';
+import { EmptyState, ErrorState } from '../components/ui/ListState';
+import { useDebouncedValue } from '../hooks/useDebouncedValue';
 
-const MOCK = [
-  { id: '1', title: 'Vacina anual', type: 'Vacina', date: '2026-08-10', priority: 'Alta', status: 'Pendente' },
-  { id: '2', title: 'Retorno veterinário', type: 'Consulta', date: '2026-06-20', priority: 'Média', status: 'Agendado' },
-  { id: '3', title: 'Exame de sangue', type: 'Exame', date: '2026-07-05', priority: 'Média', status: 'Pendente' },
-  { id: '4', title: 'Medicação contínua', type: 'Medicação', date: '2026-05-25', priority: 'Alta', status: 'Em uso' },
-  { id: '5', title: 'Avaliação nutricional', type: 'Check-up', date: '2026-09-01', priority: 'Baixa', status: 'Recomendado' },
-];
+export default function AgendaCuidadosScreen({ navigation }) {
+  const { data, isLoading, isError, refetch } = useAppointments();
+  const [query, setQuery] = useState('');
+  const [status, setStatus] = useState('');
+  const debouncedQuery = useDebouncedValue(query);
+  const items = (Array.isArray(data) ? data : []).filter((item) => {
+    const matchesQuery = `${item.title || ''} ${item.type || ''}`.toLowerCase().includes(debouncedQuery.toLowerCase());
+    return matchesQuery && (!status || item.status === status);
+  });
 
-export default function AgendaCuidadosScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#F6FEFA' }}>
       <FlatList
-        data={MOCK}
-        keyExtractor={(i) => i.id}
+        data={items}
+        refreshControl={<RefreshControl refreshing={isLoading && !!data} onRefresh={refetch} />}
+        ListEmptyComponent={isError ? <ErrorState title="Erro ao carregar agenda." onRetry={refetch} /> : !isLoading ? <EmptyState title="Nenhuma consulta encontrada." description="Agende uma consulta ou ajuste sua busca." /> : null}
+        ListFooterComponent={isLoading && !data ? <LoadingSkeleton rows={3} /> : null}
+        keyExtractor={(item, index) => item.id?.toString() || `${item.date || 'consulta'}-${index}`}
         contentContainerStyle={styles.container}
-        ListHeaderComponent={() => <HeaderSection title="Agenda de Cuidados" subtitle="Itens simulados para acompanhamento preventivo" />}
+        ListHeaderComponent={() => (
+          <View>
+            <HeaderSection title="Agenda de Cuidados" subtitle="Próximos compromissos e lembretes" />
+            <View style={{ paddingHorizontal: 16, marginTop: 8 }}>
+              <AppButton title="Novo" onPress={() => navigation.navigate('AppointmentForm')} />
+            </View>
+            <View style={styles.controls}>
+              <SearchBar value={query} onChangeText={setQuery} placeholder="Buscar consulta" />
+              <AppButton title={status ? 'Todas' : 'Pendentes'} variant="outline" onPress={() => setStatus(status ? '' : 'Agendada')} />
+            </View>
+          </View>
+        )}
         renderItem={({ item }) => (
-          <ProfileCard title={item.title} icon={'📌'}>
-            <Text style={{ color: '#0F172A', fontWeight: '600' }}>{item.type} • {item.status}</Text>
-            <Text style={{ color: '#475569', marginTop: 6 }}>Data: {item.date}</Text>
-            <Text style={{ color: item.priority === 'Alta' ? '#DC2626' : item.priority === 'Média' ? '#F59E0B' : '#10B981', marginTop: 6 }}>Prioridade: {item.priority}</Text>
-          </ProfileCard>
+          <TouchableOpacity onPress={() => navigation.navigate('AppointmentDetails', { id: item.id })}>
+            <ProfileCard title={item.title || 'Consulta'} icon={'📌'}>
+              <Text style={{ color: '#0F172A', fontWeight: '600' }}>{item.type || 'Consulta'} • {item.status || '-'}</Text>
+              <Text style={{ color: '#475569', marginTop: 6 }}>Data: {item.date}</Text>
+            </ProfileCard>
+          </TouchableOpacity>
         )}
       />
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({ container: { padding: 16 } });
+const styles = StyleSheet.create({ container: { padding: 16 }, controls: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 12 } });

@@ -1,19 +1,19 @@
 import { useContext } from "react";
 import {
-    Alert,
-    Image,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View,
+  Alert,
+  Image,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 import AppButton from '../../components/AppButton';
 import ProfileCard from '../../components/ProfileCard';
 import { UserContext } from "../context/UserContext";
 
 
-export default function pagPerfil({ navigation }) {
+export default function PagPerfil({ navigation }) {
   const { user, clearUser } = useContext(UserContext);
 
   const handleClear = async () => {
@@ -76,6 +76,8 @@ export default function pagPerfil({ navigation }) {
               <View style={{ height: 8 }} />
               <AppButton title="Agenda de Cuidados" onPress={() => navigation.navigate('AgendaCuidados')} variant="outline" style={{ marginBottom: 12 }} icon="📅" />
               <AppButton title="Alertas e Recomendações" onPress={() => navigation.navigate('Alertas')} variant="outline" style={{ marginBottom: 12 }} icon="⚠️" />
+              <AppButton title="Histórico de notificações" onPress={() => navigation.navigate('HistoricoNotificacoes')} variant="outline" style={{ marginBottom: 12 }} icon="🔔" />
+              <AppButton title="Configurações" onPress={() => navigation.navigate('Configuracoes')} variant="outline" style={{ marginBottom: 12 }} icon="⚙️" />
               <AppButton title="Limpar dados" onPress={handleClear} variant="outline" icon="🗑️" />
             </>
           )}
