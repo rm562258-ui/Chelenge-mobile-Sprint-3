@@ -12,9 +12,17 @@ const schema = z.object({
     petNome: z.string().min(1, 'Nome obrigatório'),
     especie: z.string().optional(),
     raca: z.string().optional(),
-    idade: z.union([z.string(), z.number()]).optional(),
-    peso: z.union([z.string(), z.number()]).optional(),
+    idade: z.string().regex(/^\d*$/, 'A idade deve conter apenas números.').optional(),
+    peso: z.string().regex(/^\d*(?:[.,]\d*)?$/, 'O peso deve conter apenas números.').optional(),
 });
+
+const onlyDigits = (value = '') => value.replace(/\D/g, '');
+
+const onlyNumber = (value = '') => {
+    const normalized = value.replace(',', '.').replace(/[^\d.]/g, '');
+    const [integerPart, ...decimalParts] = normalized.split('.');
+    return decimalParts.length ? `${integerPart}.${decimalParts.join('')}` : integerPart;
+};
 
 export default function PetFormScreen({ route, navigation }) {
     const { id } = route.params || {};
@@ -23,7 +31,13 @@ export default function PetFormScreen({ route, navigation }) {
     const { control, handleSubmit, reset } = useForm({ resolver: zodResolver(schema), defaultValues: {} });
 
     useEffect(() => {
-        if (pet) reset(pet);
+        if (pet) {
+            reset({
+                ...pet,
+                idade: String(pet.idade ?? pet.age ?? ''),
+                peso: String(pet.peso ?? pet.weight ?? ''),
+            });
+        }
     }, [pet, reset]);
 
     const createMutation = useCreatePet();
@@ -55,6 +69,14 @@ export default function PetFormScreen({ route, navigation }) {
 
                     <Controller control={control} name="raca" render={({ field }) => (
                         <AppInput label="Raça" value={field.value} onChangeText={field.onChange} placeholder="SRD / Labrador" />
+                    )} />
+
+                    <Controller control={control} name="idade" render={({ field }) => (
+                        <AppInput label="Idade" value={String(field.value ?? '')} onChangeText={(value) => field.onChange(onlyDigits(value))} placeholder="Ex.: 4" keyboardType="numeric" />
+                    )} />
+
+                    <Controller control={control} name="peso" render={({ field }) => (
+                        <AppInput label="Peso (kg)" value={String(field.value ?? '')} onChangeText={(value) => field.onChange(onlyNumber(value))} placeholder="Ex.: 8,5" keyboardType="decimal-pad" />
                     )} />
 
                     <View style={{ height: 12 }} />

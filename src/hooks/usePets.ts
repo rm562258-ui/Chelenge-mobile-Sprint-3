@@ -1,11 +1,30 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import petService, { type PetPayload } from '../services/petService';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { getOfflinePets } from '../services/offlinePetStorage';
+import { petService, type PetPayload } from '../services/petService';
 import { useApiQuery } from './useApiQuery';
 
-export function usePets() {
-    const queryKey = ['pets'];
+const PETS_QUERY_KEY = ['pets'];
 
-    const list = useApiQuery<any, Error>(queryKey, () => petService.list().then((r) => r.data));
+export function usePets() {
+    const queryKey = PETS_QUERY_KEY;
+
+    const qc = useQueryClient();
+    useEffect(() => {
+        void getOfflinePets().then((localPets) => {
+            if (localPets.length > 0) qc.setQueryData(PETS_QUERY_KEY, localPets);
+        });
+    }, [qc]);
+
+    const list = useQuery<any[], Error>({
+        queryKey,
+        queryFn: async () => {
+            const localPets = await getOfflinePets();
+            if (localPets.length > 0) qc.setQueryData(queryKey, localPets);
+            const result = await petService.list();
+            return result.data;
+        },
+    });
 
     return {
         ...list,
@@ -41,6 +60,9 @@ export function useDeletePet() {
     const qc = useQueryClient();
     return useMutation({
         mutationFn: (id: string) => petService.delete(id).then((r) => r.data),
-        onSuccess: () => qc.invalidateQueries({ queryKey: ['pets'] }),
+        onSuccess: (_data, id) => {
+            qc.setQueryData<any[]>(PETS_QUERY_KEY, (current = []) => current.filter((pet) => String(pet.id) !== String(id)));
+            void qc.invalidateQueries({ queryKey: PETS_QUERY_KEY });
+        },
     });
 }

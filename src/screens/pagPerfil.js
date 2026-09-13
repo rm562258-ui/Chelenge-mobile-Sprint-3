@@ -1,29 +1,68 @@
 import { useContext } from "react";
 import {
-  Alert,
-  Image,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
+    Alert,
+    Image,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    View,
 } from "react-native";
 import AppButton from '../../components/AppButton';
 import ProfileCard from '../../components/ProfileCard';
 import { UserContext } from "../context/UserContext";
+import { useDeletePet, usePets } from '../hooks/usePets';
 
 
 export default function PagPerfil({ navigation }) {
   const { user, clearUser } = useContext(UserContext);
+  const { data: pets = [], isLoading: isPetsLoading } = usePets();
+  const deletePetMutation = useDeletePet();
 
-  const handleClear = async () => {
-    Alert.alert('Confirmar', 'Deseja limpar os dados salvos do pet?', [
+  const handleDeletePet = (pet) => {
+    const petName = pet.petNome || pet.name || 'Pet sem nome';
+
+    Alert.alert('Confirmar exclusão', `Deseja apagar ${petName}?`, [
       { text: 'Cancelar', style: 'cancel' },
-      { text: 'OK', onPress: async () => { if (clearUser) await clearUser(); } }
+      {
+        text: 'Apagar',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await deletePetMutation.mutateAsync(String(pet.id));
+          } catch {
+            Alert.alert('Erro', 'Não foi possível apagar este pet.');
+          }
+        },
+      },
     ]);
   };
 
-  const empty = !user || !user.petNome;
+  const handleClear = () => {
+    if (registeredPets.length === 0) {
+      Alert.alert('Confirmar', 'Deseja limpar os dados salvos do pet?', [
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'OK', onPress: async () => { if (clearUser) await clearUser(); } },
+      ]);
+      return;
+    }
+
+    Alert.alert(
+      'Escolha um pet',
+      'Selecione qual pet deseja apagar.',
+      [
+        ...registeredPets.map((pet) => ({
+          text: pet.petNome || pet.name || 'Pet sem nome',
+          onPress: () => handleDeletePet(pet),
+        })),
+        { text: 'Cancelar', style: 'cancel' },
+      ],
+    );
+  };
+
+  const registeredPets = Array.isArray(pets) ? pets : [];
+  const empty = registeredPets.length === 0 && (!user || !user.petNome);
+  const mainPet = registeredPets[0];
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#F6FEFA' }}>
@@ -42,10 +81,14 @@ export default function PagPerfil({ navigation }) {
         </View>
 
         <View style={styles.mainContent}>
-          <Text style={styles.name}>{user?.petNome || 'Nenhum pet cadastrado'}</Text>
+          <Text style={styles.name}>{mainPet?.petNome || mainPet?.name || user?.petNome || (isPetsLoading ? 'Carregando pet...' : 'Nenhum pet cadastrado')}</Text>
           <View style={{ height: 8 }} />
 
-          {empty ? (
+          {isPetsLoading && registeredPets.length === 0 ? (
+            <ProfileCard title="Carregando pets" icon="🐾">
+              <Text>Buscando os pets cadastrados...</Text>
+            </ProfileCard>
+          ) : empty ? (
             <ProfileCard title="Sem cadastro" icon="ℹ️">
               <Text>Não há perfil de pet salvo. Vá para Cadastro para registrar um pet.</Text>
               <View style={{ height: 8 }} />
@@ -53,16 +96,26 @@ export default function PagPerfil({ navigation }) {
             </ProfileCard>
           ) : (
             <>
-              <ProfileCard title="Dados do Pet" icon="🐾">
-                <Text style={{ color: '#0F172A', fontWeight: '600' }}>{user.petNome}</Text>
-                <Text style={{ color: '#475569', marginTop: 4 }}>{user.especie} • {user.raca}</Text>
-                <Text style={{ color: '#475569', marginTop: 4 }}>Idade: {user.idade || '-'} • Peso: {user.peso || '-'}</Text>
-              </ProfileCard>
+              {registeredPets.map((pet) => (
+                <ProfileCard key={pet.id} title="Dados do Pet" icon="🐾">
+                  <Text style={{ color: '#0F172A', fontWeight: '600' }}>{pet.petNome || pet.name || 'Pet sem nome'}</Text>
+                  <Text style={{ color: '#475569', marginTop: 4 }}>{pet.especie || pet.type || '-'} • {pet.raca || pet.breed || '-'}</Text>
+                  <Text style={{ color: '#475569', marginTop: 4 }}>Idade: {pet.idade || pet.age || '-'} • Peso: {(pet.peso || pet.weight) ? `${pet.peso || pet.weight} kg` : '-'}</Text>
+                  <Text style={{ color: pet.pendingSync ? '#64748B' : '#15803D', fontSize: 12, fontWeight: '700', marginTop: 8 }}>
+                    {pet.pendingSync ? 'Salvo offline' : 'Sincronizado'}
+                  </Text>
+                  <View style={{ height: 8 }} />
+                  <AppButton title="Editar pet" onPress={() => navigation.navigate('CadastroPet', { id: pet.id })} variant="outline" />
+                </ProfileCard>
+              ))}
 
-              <ProfileCard title="Tutor Responsável" icon="👤">
-                <Text style={{ color: '#0F172A', fontWeight: '600' }}>{user.tutorNome}</Text>
-                <Text style={{ color: '#475569', marginTop: 4 }}>Contato: {user.contatoTutor || '-'}</Text>
-              </ProfileCard>
+              {!registeredPets.length && user?.petNome ? (
+                <ProfileCard title="Dados do Pet" icon="🐾">
+                  <Text style={{ color: '#0F172A', fontWeight: '600' }}>{user.petNome}</Text>
+                  <Text style={{ color: '#475569', marginTop: 4 }}>{user.especie} • {user.raca}</Text>
+                  <Text style={{ color: '#475569', marginTop: 4 }}>Idade: {user.idade || '-'} • Peso: {user.peso ? `${user.peso} kg` : '-'}</Text>
+                </ProfileCard>
+              ) : null}
 
               <ProfileCard title="Clínica de Referência" icon="🏥">
                 <Text style={{ color: '#0F172A', fontWeight: '600' }}>{user.clinica || '-'}</Text>

@@ -9,23 +9,38 @@ import ProfileCard from '../../components/ProfileCard';
 import { useAppointments, useCreateAppointment, useUpdateAppointment } from '../hooks/useAppointments';
 
 const schema = z.object({
-    petId: z.string().min(1),
-    date: z.string().min(1),
-    type: z.string().optional(),
-    status: z.string().optional(),
+    petName: z.string().min(1, 'Informe o nome do pet'),
+    date: z.string().min(1, 'Informe a data'),
+    type: z.string().min(1, 'Informe o tipo da consulta'),
+    status: z.enum(['Agendada', 'Concluída', 'Atrasada']),
     notes: z.string().optional(),
 });
+
+const formatDateInput = (value = '') => {
+    const digits = value.replace(/\D/g, '').slice(0, 6);
+    if (digits.length <= 2) return digits;
+    if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+    return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+};
+
+const formatDateForForm = (value = '') => {
+    const isoMatch = value.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    return isoMatch ? `${isoMatch[3]}/${isoMatch[2]}/${isoMatch[1].slice(-2)}` : formatDateInput(value);
+};
 
 export default function AppointmentFormScreen({ route, navigation }) {
     const { id } = route.params || {};
 
     const { data } = useAppointments();
-    const { control, handleSubmit, reset } = useForm({ resolver: zodResolver(schema), defaultValues: {} });
+    const { control, handleSubmit, reset } = useForm({
+        resolver: zodResolver(schema),
+        defaultValues: { petName: '', date: '', type: '', status: 'Agendada', notes: '' },
+    });
 
     useEffect(() => {
         if (id && data) {
             const appointment = data.find((item) => item.id === id);
-            if (appointment) reset(appointment);
+            if (appointment) reset({ ...appointment, date: formatDateForForm(appointment.date) });
         }
     }, [id, data, reset]);
 
@@ -47,20 +62,16 @@ export default function AppointmentFormScreen({ route, navigation }) {
         <SafeAreaView style={{ flex: 1, backgroundColor: '#F6FEFA' }}>
             <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
                 <ProfileCard title={id ? 'Editar Consulta' : 'Nova Consulta'} icon="📅">
-                    <Controller control={control} name="petId" render={({ field }) => (
-                        <AppInput label="Pet ID" value={field.value} onChangeText={field.onChange} placeholder="ID do pet" />
+                    <Controller control={control} name="petName" render={({ field }) => (
+                        <AppInput label="Nome do pet" value={field.value} onChangeText={field.onChange} placeholder="Nome do pet" />
                     )} />
 
                     <Controller control={control} name="date" render={({ field }) => (
-                        <AppInput label="Data" value={field.value} onChangeText={field.onChange} placeholder="YYYY-MM-DD" />
+                        <AppInput label="Data" value={field.value} onChangeText={(value) => field.onChange(formatDateInput(value))} placeholder="DD/MM/YY" keyboardType="numeric" />
                     )} />
 
                     <Controller control={control} name="type" render={({ field }) => (
                         <AppInput label="Tipo" value={field.value} onChangeText={field.onChange} placeholder="Consulta / Retorno" />
-                    )} />
-
-                    <Controller control={control} name="status" render={({ field }) => (
-                        <AppInput label="Status" value={field.value} onChangeText={field.onChange} placeholder="Agendada / Concluída" />
                     )} />
 
                     <Controller control={control} name="notes" render={({ field }) => (
@@ -75,4 +86,6 @@ export default function AppointmentFormScreen({ route, navigation }) {
     );
 }
 
-const styles = StyleSheet.create({ container: { padding: 16 } });
+const styles = StyleSheet.create({
+    container: { padding: 16 },
+});

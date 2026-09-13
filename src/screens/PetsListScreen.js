@@ -3,11 +3,11 @@ import { FlatList, RefreshControl, SafeAreaView, StyleSheet, Text, TouchableOpac
 import AppButton from '../../components/AppButton';
 import HeaderSection from '../../components/HeaderSection';
 import ProfileCard from '../../components/ProfileCard';
-import { usePets } from '../hooks/usePets';
-import SearchBar from '../components/ui/SearchBar';
-import LoadingSkeleton from '../components/ui/LoadingSkeleton';
 import { EmptyState, ErrorState } from '../components/ui/ListState';
+import LoadingSkeleton from '../components/ui/LoadingSkeleton';
+import SearchBar from '../components/ui/SearchBar';
 import { useDebouncedValue } from '../hooks/useDebouncedValue';
+import { usePets } from '../hooks/usePets';
 
 export default function PetsListScreen({ navigation }) {
     const { data, isLoading, isError, refetch } = usePets();
@@ -43,6 +43,14 @@ export default function PetsListScreen({ navigation }) {
                     <TouchableOpacity onPress={() => navigation.navigate('PetDetails', { id: item.id })}>
                         <ProfileCard title={item.petNome || '—'} icon="🐾">
                             <Text style={{ color: '#475569' }}>{item.especie || '-'} • {item.raca || '-'}</Text>
+                            <Text style={{
+                                color: item.pendingSync ? '#64748B' : '#15803D',
+                                fontSize: 12,
+                                fontWeight: '700',
+                                marginTop: 8,
+                            }}>
+                                {item.pendingSync ? 'Salvo offline' : 'Sincronizado'}
+                            </Text>
                         </ProfileCard>
                     </TouchableOpacity>
                 )}
