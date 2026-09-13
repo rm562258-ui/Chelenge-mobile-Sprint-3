@@ -581,15 +581,12 @@ Usuário não autenticado
 AuthStack
 ```
 
-A Sprint 3 exige que telas protegidas sejam acessíveis somente após autenticação e que o logout bloqueie imediatamente o acesso à área protegida. fileciteturn1file8L486-L497
 
 ## 14. Vídeo de demonstração
 
 Vídeo de demonstração do projeto:
 
 **YouTube:** https://youtu.be/o4Tgl3FewcU
-
-O vídeo deve demonstrar o aplicativo real entregue no repositório, incluindo navegação, autenticação, integração com a API e funcionamento em emulador ou dispositivo. A orientação da Sprint 3 também estabelece duração máxima de 5 minutos para o vídeo da disciplina. fileciteturn1file3L193-L210
 
 ## 15. Integrantes
 
