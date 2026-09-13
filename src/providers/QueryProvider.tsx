@@ -7,7 +7,7 @@ export function QueryProvider({ children }: { children: ReactNode }) {
             queries: {
                 retry: 1,
                 staleTime: 1000 * 60, // 1 minute
-                cacheTime: 1000 * 60 * 5, // 5 minutes
+                gcTime: 1000 * 60 * 5, // 5 minutes
                 refetchOnWindowFocus: true,
                 refetchOnReconnect: true,
                 refetchOnMount: false,

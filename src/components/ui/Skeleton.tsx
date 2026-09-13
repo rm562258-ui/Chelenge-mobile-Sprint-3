@@ -1,7 +1,7 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, type ViewStyle } from 'react-native';
 
-export function Skeleton({ height = 14, width = '100%', borderRadius = 12 }: { height?: number; width?: string | number; borderRadius?: number }) {
+export function Skeleton({ height = 14, width = '100%', borderRadius = 12 }: { height?: number; width?: ViewStyle['width']; borderRadius?: number }) {
   return (
     <View
       style={{

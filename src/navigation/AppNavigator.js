@@ -6,8 +6,8 @@ import AgendaCuidadosScreen from '../screens/AgendaCuidadosScreen';
 import AlertasScreen from '../screens/AlertasScreen';
 import AppointmentDetailsScreen from '../screens/AppointmentDetailsScreen';
 import AppointmentFormScreen from '../screens/AppointmentFormScreen';
-import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
 import ConfiguracoesScreen from '../screens/ConfiguracoesScreen';
+import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
 import HistoricoNotificacoesScreen from '../screens/HistoricoNotificacoesScreen';
 import HomeScreen from '../screens/HomeScreen';
 import IaVeterinariaScreen from '../screens/IaVeterinariaScreen';
@@ -58,7 +58,7 @@ function AppStack() {
       <Stack.Screen name="Home" component={HomeScreen} options={{ title: 'ClyvoCare Pet' }} />
       <Stack.Screen name="Configuracoes" component={ConfiguracoesScreen} options={{ title: 'Configurações' }} />
       <Stack.Screen name="HistoricoNotificacoes" component={HistoricoNotificacoesScreen} options={{ title: 'Notificações' }} />
-      <Stack.Screen name="IaVeterinaria" component={IaVeterinariaScreen} options={{ title: 'IA Veterinária' }} />
+      <Stack.Screen name="IaVeterinaria" component={IaVeterinariaScreen} options={{ title: 'Perguntas frequentes' }} />
       <Stack.Screen name="Pets" component={PetsListScreen} options={{ title: 'Meus Pets' }} />
       <Stack.Screen name="PetDetails" component={PetDetailsScreen} options={{ title: 'Detalhes do Pet' }} />
       <Stack.Screen name="CadastroPet" component={PetFormScreen} options={{ title: 'Cadastro do Pet' }} />
@@ -73,7 +73,7 @@ function AppStack() {
       <Stack.Screen name="MedicationForm" component={MedicationFormScreen} options={{ title: 'Registrar Medicamento' }} />
       <Stack.Screen name="MedicationDetails" component={MedicationDetailsScreen} options={{ title: 'Detalhes do Medicamento' }} />
       <Stack.Screen name="Alertas" component={AlertasScreen} options={{ title: 'Alertas' }} />
-      <Stack.Screen name="Equipe" component={PagDev} options={{ title: 'Equipe' }} />
+      <Stack.Screen name="Equipe" component={PagDev} options={{ title: 'Integrantes' }} />
     </Stack.Navigator>
   );
 }

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "151824468878",
+    "project_id": "clyvo-vet-mobile",
+    "storage_bucket": "clyvo-vet-mobile.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:151824468878:android:f47da0ee69060560aeb2df",
+        "android_client_info": {
+          "package_name": "com.clyvocare.pet"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBUVrf2yPxZkDVjeMNrAm8O5fy91tIm0x4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

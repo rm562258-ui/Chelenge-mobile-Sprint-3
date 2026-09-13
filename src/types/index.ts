@@ -34,3 +34,39 @@ export type AuthTokens = {
     accessToken?: string;
     refreshToken?: string;
 };
+
+export type User = {
+    id: string;
+    name: string;
+    email: string;
+    avatar?: string;
+};
+
+export type Appointment = {
+    id: string;
+    petId: string;
+    petName: string;
+    date: string;
+    time: string;
+    reason: string;
+    status: 'confirmed' | 'pending' | 'cancelled';
+};
+
+export type Medication = {
+    id: string;
+    petId: string;
+    petName: string;
+    name: string;
+    dosage: string;
+    frequency: string;
+    active: boolean;
+};
+
+export type Vaccine = {
+    id: string;
+    petId: string;
+    petName: string;
+    name: string;
+    dueDate: string;
+    status: 'pending' | 'completed';
+};

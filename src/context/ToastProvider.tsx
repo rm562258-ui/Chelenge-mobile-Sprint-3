@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { subscribeToast } from '../utils/toast';
 import { Animated, Text } from 'react-native';
+import { subscribeToast } from '../utils/toast';
 
 type ToastType = 'success' | 'error' | 'info';
 
@@ -27,10 +27,16 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     ]).start(() => setMessage(null));
   }, [message, opacity]);
 
-  useEffect(() => subscribeToast((nextMessage, nextType) => {
-    setType(nextType);
-    setMessage(nextMessage);
-  }), []);
+  useEffect(() => {
+    const unsubscribe = subscribeToast((nextMessage, nextType) => {
+      setType(nextType);
+      setMessage(nextMessage);
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   const showToast = (nextMessage: string, nextType: ToastType = 'info') => {
     setType(nextType);
