@@ -79,14 +79,11 @@ export const firebaseHealthCheck = async () => {
         apiKey: maskValue(firebaseConfig.apiKey),
     };
 
-    console.log('=== FIREBASE HEALTH CHECK ===');
-    console.log('Firebase inicializado:', report.firebaseInitialized);
-    console.log('Project ID:', report.projectId);
-    console.log('Auth Domain:', firebaseConfig.authDomain);
-    console.log('Auth disponível:', report.authAvailable);
-    console.log('Environment variables carregadas:', report.environmentVariablesLoaded);
-    console.log('API Key (mascarada):', report.apiKey);
-    console.log('Usuário autenticado:', auth.currentUser?.email ?? 'nenhum');
+    console.log('Verificação de saúde do Firebase concluída:', {
+        firebaseInitialized: report.firebaseInitialized,
+        authAvailable: report.authAvailable,
+        environmentVariablesLoaded: report.environmentVariablesLoaded,
+    });
 
     return report;
 };

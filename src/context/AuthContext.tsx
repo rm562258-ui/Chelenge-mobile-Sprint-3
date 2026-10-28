@@ -31,14 +31,9 @@ type AuthContextValue = {
 export const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 const reportAuthError = (operation: string, error: unknown) => {
-    const code = (error as { code?: string })?.code ?? 'auth/unknown';
-    const rawMessage = (error as { message?: string })?.message ?? 'Sem mensagem retornada pelo Firebase.';
     const message = firebaseErrorMessage(error);
 
-    console.error(`=== FIREBASE ${operation.toUpperCase()} ERROR ===`);
-    console.error(error);
-    console.error('CODE:', code);
-    console.error('MESSAGE:', rawMessage);
+    console.error(`Falha na operação Firebase: ${operation}.`);
     showToast(message, 'error');
     Alert.alert('Erro de autenticação', message);
 
@@ -48,7 +43,6 @@ const reportAuthError = (operation: string, error: unknown) => {
 const persistSession = async (firebaseUser: User | null) => {
     try {
         if (!firebaseUser) {
-            console.log('[AUTH] Removendo sessão do AsyncStorage.');
             await AsyncStorage.removeItem(AUTH_SESSION_KEY);
             await setAuthToken(null);
             return;
@@ -60,15 +54,10 @@ const persistSession = async (firebaseUser: User | null) => {
             displayName: firebaseUser.displayName ?? '',
         };
 
-        console.log('[AUTH] Salvando sessão no AsyncStorage:', session.email || session.uid);
         await AsyncStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(session));
         await setAuthToken(await firebaseUser.getIdToken());
-        console.log('[AUTH] Sessão salva com sucesso.');
     } catch (error) {
-        console.error('=== FIREBASE SESSION STORAGE ERROR ===');
-        console.error(error);
-        console.error('CODE:', (error as { code?: string })?.code ?? 'storage/unknown');
-        console.error('MESSAGE:', (error as { message?: string })?.message ?? 'Falha ao persistir sessão.');
+        console.error('Falha ao persistir a sessão de autenticação.');
         throw error;
     }
 };
@@ -80,7 +69,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const restoreSession = async () => {
         try {
             const storedSession = await AsyncStorage.getItem(AUTH_SESSION_KEY);
-            console.log('[AUTH] Sessão armazenada encontrada:', Boolean(storedSession));
 
             if (auth.currentUser) {
                 setUser(auth.currentUser);
@@ -88,11 +76,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             } else if (storedSession) {
                 console.log('[AUTH] Sessão armazenada aguardando restauração do Firebase.');
             }
-        } catch (error) {
-            console.error('=== FIREBASE RESTORE SESSION ERROR ===');
-            console.error(error);
-            console.error('CODE:', (error as { code?: string })?.code ?? 'storage/unknown');
-            console.error('MESSAGE:', (error as { message?: string })?.message ?? 'Falha ao restaurar sessão.');
+        } catch {
+            console.error('Falha ao restaurar a sessão de autenticação.');
             showToast('Não foi possível restaurar sua sessão.', 'error');
         } finally {
             setLoading(false);
@@ -100,7 +85,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     useEffect(() => {
-        void firebaseHealthCheck();
+        if (__DEV__) {
+            void firebaseHealthCheck();
+        }
 
         const unsubscribe = onIdTokenChanged(auth, async (firebaseUser) => {
             try {
