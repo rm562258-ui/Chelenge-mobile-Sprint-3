@@ -4,8 +4,8 @@ import { Controller, useForm } from 'react-hook-form';
 import { ActivityIndicator, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { z } from 'zod';
 
-import AppButton from '../../components/AppButton';
-import AppInput from '../../components/AppInput';
+import AppButton from '../components/ui/AppButton';
+import AppInput from '../components/ui/AppInput';
 import { useAuth } from '../hooks/useAuth';
 
 const loginSchema = z.object({

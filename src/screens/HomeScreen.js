@@ -1,8 +1,8 @@
 import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import AppButton from '../../components/AppButton';
-import HeaderSection from '../../components/HeaderSection';
-import ProfileCard from '../../components/ProfileCard';
+import AppButton from '../components/ui/AppButton';
+import HeaderSection from '../components/ui/HeaderSection';
+import ProfileCard from '../components/ui/ProfileCard';
 import { useAuth } from '../hooks/useAuth';
 
 export default function HomeScreen({ navigation }) {

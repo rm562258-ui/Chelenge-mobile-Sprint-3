@@ -8,8 +8,8 @@ import {
     Text,
     View,
 } from "react-native";
-import AppButton from '../../components/AppButton';
-import ProfileCard from '../../components/ProfileCard';
+import AppButton from '../components/ui/AppButton';
+import ProfileCard from '../components/ui/ProfileCard';
 import { UserContext } from "../context/UserContext";
 import { useDeletePet, usePets } from '../hooks/usePets';
 

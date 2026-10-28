@@ -3,6 +3,7 @@ import api from '../api/client';
 import { createCrudService } from '../api/crudService';
 import { API_ENDPOINTS } from '../api/endpoints';
 import { showToast } from '../utils/toast';
+import { isPast, parseAppDate } from '../utils/date';
 import {
     deleteOfflineAppointment,
     getOfflineAppointments,
@@ -34,21 +35,12 @@ const isNetworkFailure = (error: unknown) => {
     return !status || code === 'ECONNABORTED' || message.includes('network error') || message.includes('timeout') || status >= 500;
 };
 
-const parseDate = (value = '') => {
-    const ddmmyy = value.match(/^(\d{2})\/(\d{2})\/(\d{2})$/);
-    if (ddmmyy) return new Date(2000 + Number(ddmmyy[3]), Number(ddmmyy[2]) - 1, Number(ddmmyy[1]));
-
-    const iso = value.match(/^(\d{4})-(\d{2})-(\d{2})/);
-    if (iso) return new Date(Number(iso[1]), Number(iso[2]) - 1, Number(iso[3]));
-
-    return null;
-};
-
 export const normalizeAppointment = <T extends Partial<AppointmentPayload>>(appointment: T) => {
-    const date = parseDate(appointment.date);
+    const date = parseAppDate(appointment.date);
+    if (date) date.setHours(23, 59, 59, 999);
     const status = appointment.status === 'Concluída'
         ? 'Concluída'
-        : date && date.setHours(23, 59, 59, 999) < Date.now()
+        : date && isPast(date)
             ? 'Atrasada'
             : 'Agendada';
 

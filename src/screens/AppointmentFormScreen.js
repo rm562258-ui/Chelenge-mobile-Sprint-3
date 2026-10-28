@@ -3,10 +3,11 @@ import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
 import * as z from 'zod';
-import AppButton from '../../components/AppButton';
-import AppInput from '../../components/AppInput';
-import ProfileCard from '../../components/ProfileCard';
+import AppButton from '../components/ui/AppButton';
+import AppInput from '../components/ui/AppInput';
+import ProfileCard from '../components/ui/ProfileCard';
 import { useAppointments, useCreateAppointment, useUpdateAppointment } from '../hooks/useAppointments';
+import { formatDisplayDate, maskDateInput } from '../utils/date';
 
 const schema = z.object({
     petName: z.string().min(1, 'Informe o nome do pet'),
@@ -15,18 +16,6 @@ const schema = z.object({
     status: z.enum(['Agendada', 'Concluída', 'Atrasada']),
     notes: z.string().optional(),
 });
-
-const formatDateInput = (value = '') => {
-    const digits = value.replace(/\D/g, '').slice(0, 6);
-    if (digits.length <= 2) return digits;
-    if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
-    return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
-};
-
-const formatDateForForm = (value = '') => {
-    const isoMatch = value.match(/^(\d{4})-(\d{2})-(\d{2})/);
-    return isoMatch ? `${isoMatch[3]}/${isoMatch[2]}/${isoMatch[1].slice(-2)}` : formatDateInput(value);
-};
 
 export default function AppointmentFormScreen({ route, navigation }) {
     const { id } = route.params || {};
@@ -40,7 +29,7 @@ export default function AppointmentFormScreen({ route, navigation }) {
     useEffect(() => {
         if (id && data) {
             const appointment = data.find((item) => item.id === id);
-            if (appointment) reset({ ...appointment, date: formatDateForForm(appointment.date) });
+            if (appointment) reset({ ...appointment, date: maskDateInput(formatDisplayDate(appointment.date)) });
         }
     }, [id, data, reset]);
 
@@ -67,7 +56,7 @@ export default function AppointmentFormScreen({ route, navigation }) {
                     )} />
 
                     <Controller control={control} name="date" render={({ field }) => (
-                        <AppInput label="Data" value={field.value} onChangeText={(value) => field.onChange(formatDateInput(value))} placeholder="DD/MM/YY" keyboardType="numeric" />
+                        <AppInput label="Data" value={field.value} onChangeText={(value) => field.onChange(maskDateInput(value))} placeholder="DD/MM/YY" keyboardType="numeric" />
                     )} />
 
                     <Controller control={control} name="type" render={({ field }) => (

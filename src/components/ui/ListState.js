@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
-import AppButton from '../../../components/AppButton';
+import AppButton from './AppButton';
 
 export function EmptyState({ title = 'Nenhum registro encontrado.', description = 'Quando houver dados, eles aparecerão aqui.' }) {
   return <View style={styles.container}><Text style={styles.title}>{title}</Text><Text style={styles.description}>{description}</Text></View>;

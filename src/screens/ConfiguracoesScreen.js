@@ -1,8 +1,8 @@
 import { useContext, useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
-import AppButton from '../../components/AppButton';
-import HeaderSection from '../../components/HeaderSection';
-import ProfileCard from '../../components/ProfileCard';
+import AppButton from '../components/ui/AppButton';
+import HeaderSection from '../components/ui/HeaderSection';
+import ProfileCard from '../components/ui/ProfileCard';
 import { UserContext } from '../context/UserContext';
 import { useAuth } from '../hooks/useAuth';
 import { showToast } from '../utils/toast';

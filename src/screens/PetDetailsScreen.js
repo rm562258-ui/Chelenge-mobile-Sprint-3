@@ -1,6 +1,6 @@
 import { Alert, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
-import AppButton from '../../components/AppButton';
-import ProfileCard from '../../components/ProfileCard';
+import AppButton from '../components/ui/AppButton';
+import ProfileCard from '../components/ui/ProfileCard';
 import { useDeletePet, usePet } from '../hooks/usePets';
 
 export default function PetDetailsScreen({ route, navigation }) {

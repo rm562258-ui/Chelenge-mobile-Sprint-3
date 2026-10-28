@@ -3,9 +3,9 @@ import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
 import * as z from 'zod';
-import AppButton from '../../components/AppButton';
-import AppInput from '../../components/AppInput';
-import ProfileCard from '../../components/ProfileCard';
+import AppButton from '../components/ui/AppButton';
+import AppInput from '../components/ui/AppInput';
+import ProfileCard from '../components/ui/ProfileCard';
 import { useCreatePet, usePet, useUpdatePet } from '../hooks/usePets';
 
 const schema = z.object({

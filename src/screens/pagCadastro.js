@@ -10,10 +10,10 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import AppButton from '../../components/AppButton';
-import AppInput from '../../components/AppInput';
-import HeaderSection from '../../components/HeaderSection';
-import ProfileCard from '../../components/ProfileCard';
+import AppButton from '../components/ui/AppButton';
+import AppInput from '../components/ui/AppInput';
+import HeaderSection from '../components/ui/HeaderSection';
+import ProfileCard from '../components/ui/ProfileCard';
 import { UserContext } from "../context/UserContext";
 
 export default function PagCadastro({ navigation }) {

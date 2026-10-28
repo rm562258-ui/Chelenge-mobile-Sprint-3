@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import HeaderSection from '../../components/HeaderSection';
-import ProfileCard from '../../components/ProfileCard';
+import HeaderSection from '../components/ui/HeaderSection';
+import ProfileCard from '../components/ui/ProfileCard';
 
 const FAQ_ITEMS = [
   {

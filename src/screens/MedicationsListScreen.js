@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react';
 import { FlatList, RefreshControl, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import AppButton from '../../components/AppButton';
-import HeaderSection from '../../components/HeaderSection';
-import ProfileCard from '../../components/ProfileCard';
+import AppButton from '../components/ui/AppButton';
+import HeaderSection from '../components/ui/HeaderSection';
+import ProfileCard from '../components/ui/ProfileCard';
 import { useMedications } from '../hooks/useMedications';
 import SearchBar from '../components/ui/SearchBar';
 import LoadingSkeleton from '../components/ui/LoadingSkeleton';

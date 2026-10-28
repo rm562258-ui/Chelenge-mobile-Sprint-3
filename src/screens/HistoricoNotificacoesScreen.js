@@ -1,8 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
 import { FlatList, SafeAreaView, StyleSheet, Text } from 'react-native';
-import HeaderSection from '../../components/HeaderSection';
-import ProfileCard from '../../components/ProfileCard';
+import HeaderSection from '../components/ui/HeaderSection';
+import ProfileCard from '../components/ui/ProfileCard';
 import { EmptyState } from '../components/ui/ListState';
 
 const STORAGE_KEY = '@clyvocare:notification-history';

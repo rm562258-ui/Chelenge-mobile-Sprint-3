@@ -1,6 +1,6 @@
 import { Alert, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
-import AppButton from '../../components/AppButton';
-import ProfileCard from '../../components/ProfileCard';
+import AppButton from '../components/ui/AppButton';
+import ProfileCard from '../components/ui/ProfileCard';
 import { useDeleteMedication, useMedications } from '../hooks/useMedications';
 
 export default function MedicationDetailsScreen({ route, navigation }) {

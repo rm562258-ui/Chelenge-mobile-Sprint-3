@@ -1,28 +1,17 @@
-import { useState } from 'react';
 import { FlatList, RefreshControl, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import AppButton from '../../components/AppButton';
-import HeaderSection from '../../components/HeaderSection';
-import ProfileCard from '../../components/ProfileCard';
+import AppButton from '../components/ui/AppButton';
+import HeaderSection from '../components/ui/HeaderSection';
+import ProfileCard from '../components/ui/ProfileCard';
 import { EmptyState, ErrorState } from '../components/ui/ListState';
 import LoadingSkeleton from '../components/ui/LoadingSkeleton';
 import SearchBar from '../components/ui/SearchBar';
 import { useAppointments } from '../hooks/useAppointments';
-import { useDebouncedValue } from '../hooks/useDebouncedValue';
-
-const formatDate = (value = '') => {
-  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})/);
-  return match ? `${match[3]}/${match[2]}/${match[1].slice(-2)}` : value;
-};
+import { useFilteredAppointments } from '../hooks/useFilteredAppointments';
+import { formatDisplayDate } from '../utils/date';
 
 export default function AgendaCuidadosScreen({ navigation }) {
   const { data, isLoading, isError, refetch } = useAppointments();
-  const [query, setQuery] = useState('');
-  const [status, setStatus] = useState('');
-  const debouncedQuery = useDebouncedValue(query);
-  const items = (Array.isArray(data) ? data : []).filter((item) => {
-    const matchesQuery = `${item.title || ''} ${item.type || ''} ${item.petName || ''}`.toLowerCase().includes(debouncedQuery.toLowerCase());
-    return matchesQuery && (!status || item.status === status);
-  });
+  const { items, query, setQuery, status, toggleStatus } = useFilteredAppointments(Array.isArray(data) ? data : []);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#F6FEFA' }}>
@@ -41,7 +30,7 @@ export default function AgendaCuidadosScreen({ navigation }) {
             </View>
             <View style={styles.controls}>
               <SearchBar value={query} onChangeText={setQuery} placeholder="Buscar consulta" />
-              <AppButton title={status ? 'Todas' : 'Pendentes'} variant="outline" onPress={() => setStatus(status ? '' : 'Agendada')} />
+              <AppButton title={status ? 'Todas' : 'Pendentes'} variant="outline" onPress={toggleStatus} />
             </View>
           </View>
         )}
@@ -50,7 +39,7 @@ export default function AgendaCuidadosScreen({ navigation }) {
             <ProfileCard title={`${item.type || item.title || 'Consulta'} - ${item.petName || 'Pet'}`} icon={'📌'}>
               <Text style={{ color: '#0F172A', fontWeight: '600' }}>{item.type || 'Consulta'} • {item.status || '-'}</Text>
               <Text style={{ color: '#475569', marginTop: 6 }}>Pet: {item.petName || '-'}</Text>
-              <Text style={{ color: '#475569', marginTop: 6 }}>Data: {formatDate(item.date)}</Text>
+              <Text style={{ color: '#475569', marginTop: 6 }}>Data: {formatDisplayDate(item.date)}</Text>
             </ProfileCard>
           </TouchableOpacity>
         )}

@@ -1,12 +1,8 @@
 import { Alert, SafeAreaView, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
-import AppButton from '../../components/AppButton';
-import ProfileCard from '../../components/ProfileCard';
+import AppButton from '../components/ui/AppButton';
+import ProfileCard from '../components/ui/ProfileCard';
 import { useAppointments, useDeleteAppointment, useUpdateAppointment } from '../hooks/useAppointments';
-
-const formatDate = (value = '') => {
-    const match = value.match(/^(\d{4})-(\d{2})-(\d{2})/);
-    return match ? `${match[3]}/${match[2]}/${match[1].slice(-2)}` : value;
-};
+import { formatDisplayDate } from '../utils/date';
 
 export default function AppointmentDetailsScreen({ route, navigation }) {
     const { id } = route.params || {};
@@ -46,7 +42,7 @@ export default function AppointmentDetailsScreen({ route, navigation }) {
                 <ProfileCard title={appointment?.title || 'Consulta'} icon="📌">
                     <Text style={{ color: '#475569' }}>{appointment?.type || '-'} • {appointment?.status || '-'}</Text>
                     <Text style={{ color: '#475569', marginTop: 8 }}>Pet: {appointment?.petName || '-'}</Text>
-                    <Text style={{ marginTop: 8 }}>Data: {formatDate(appointment?.date || '') || '-'}</Text>
+                    <Text style={{ marginTop: 8 }}>Data: {formatDisplayDate(appointment?.date || '') || '-'}</Text>
                     {appointment ? (
                         <View style={styles.statusRow}>
                             <Text style={styles.statusLabel}>{appointment.status === 'Concluída' ? 'Concluída' : appointment.status === 'Atrasada' ? 'Atrasada' : 'Agendada'}</Text>

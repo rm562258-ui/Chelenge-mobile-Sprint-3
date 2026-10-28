@@ -1,7 +1,7 @@
 import { Animated, FlatList, SafeAreaView, StyleSheet } from "react-native";
-import DevCard from '../../components/DevCard';
-import HeaderSection from '../../components/HeaderSection';
-import { Colors } from '../../constants/theme';
+import DevCard from '../components/ui/DevCard';
+import HeaderSection from '../components/ui/HeaderSection';
+import { Colors } from '../theme';
 
 const team = [
   { name: "Luan Peixoto Marins Rocha", rm: "562258", photo: require('../../assets/images/react-logo.png') },
